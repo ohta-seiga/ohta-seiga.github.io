@@ -1,7 +1,11 @@
 @charset "UTF-8";
 
-.midasi1 {
+.topspace {
   margin-top: 4%;
+}
+
+.midasi1 {
+  margin-top: 2%;
   margin-bottom: 3%;
 }
 
