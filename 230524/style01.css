@@ -3,3 +3,17 @@
 .top {
   margin-top: 4%;
 }
+
+.col-15{
+  width: 20%;
+  flex: 0 0 20%;
+}
+
+.midasi1 {
+  margin-top: 4%;
+  margin-bottom: 1%;
+}
+
+.mg-rg {
+  margin-right: 1%;
+}
