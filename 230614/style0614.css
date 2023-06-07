@@ -1,0 +1,34 @@
+@charset "UTF-8";
+
+.top {
+  margin-top: 4%;
+}
+
+.col-15{
+  width: 20%;
+  flex: 0 0 20%;
+}
+
+.midasi1 {
+  margin-top: 3%;
+  margin-bottom: 1%;
+}
+
+.mg-rg {
+  margin-right: 1%;
+}
+
+.btn {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.topic {
+  margin-top: 3%;
+  margin-bottom: 3%;
+}
+
+.profile {
+  margin-right: 20px;
+  margin-left: 40px;
+}
