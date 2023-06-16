@@ -1,0 +1,55 @@
+@charset "UTF-8";
+
+.top {
+  margin-top: 4%;
+}
+
+.col-15{
+  width: 20%;
+  flex: 0 0 20%;
+}
+
+.midasi1 {
+  margin-top: 4%;
+  margin-bottom: 1%;
+}
+
+.mg-rg {
+  margin-right: 1%;
+}
+
+.btn {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.topic {
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+
+.profile {
+  margin-right: 20px;
+  margin-left: 40px;
+}
+
+.footer {
+  margin-left:25px;
+  margin-right: 25px;
+}
+
+.footer-mb {
+  margin-bottom: 6%;
+}
+
+.top-mb {
+  margin-top: 50px;
+}
+
+.navi {
+  margin-bottom: 2%;
+}
+
+.firsttop{
+  margin-left: 3%;
+}
