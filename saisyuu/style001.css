@@ -4,14 +4,27 @@
   margin-top: 4%;
 }
 
+.parent {
+  position: relative;
+}
+
+.imgfont01 {
+  position: absolute;
+  color: #FFFFFF;
+  top: 17%;
+  left: 20%
+}
+
+.imgfont02 {
+  position: absolute;
+  color: #FFFFFF;
+  top: 70%;
+  left: 55%;
+}
+
 .col-15{
   width: 20%;
   flex: 0 0 20%;
-}
-
-.midasi1 {
-  margin-top: 4%;
-  margin-bottom: 1%;
 }
 
 .mg-rg {
@@ -31,15 +44,6 @@
 .profile {
   margin-right: 20px;
   margin-left: 40px;
-}
-
-.footer {
-  margin-left:25px;
-  margin-right: 25px;
-}
-
-.footer-mb {
-  margin-bottom: 6%;
 }
 
 .top-mb {
