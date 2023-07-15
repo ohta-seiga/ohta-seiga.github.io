@@ -12,7 +12,7 @@
   position: absolute;
   color: #FFFFFF;
   top: 17%;
-  left: 20%
+  left: 16%
 }
 
 .imgfont02 {
@@ -55,5 +55,7 @@
 }
 
 .main p {
-  margin-bottom: 60px;
+  margin-left: 4%;
+  margin-bottom: 45px;
+  font-size: 20px;
 }
