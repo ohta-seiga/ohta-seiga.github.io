@@ -59,3 +59,19 @@
   margin-bottom: 45px;
   font-size: 20px;
 }
+
+.imgList {
+  width: 90%;
+}
+
+.mbicon{
+  width: 30px;
+}
+
+.lgicon{
+  width:24px;
+}
+
+.logo{
+  width: 100%;
+}
