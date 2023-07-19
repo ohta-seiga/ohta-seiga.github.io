@@ -58,6 +58,7 @@
   margin-left: 4%;
   margin-bottom: 45px;
   font-size: 20px;
+  line-height: 36px;
 }
 
 .imgList {
@@ -74,4 +75,8 @@
 
 .logo{
   width: 270px;
+}
+
+.decoration{
+  background-image: linear-gradient(transparent 60%, #ffd700 90%);
 }
