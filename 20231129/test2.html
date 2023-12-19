@@ -3,61 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rakuten API Example</title>
+  <link rel="stylesheet" href="test2.css">
+  <title>Ranking</title>
 </head>
 <body>
-<h1>Rakuten API Ranking</h1>
-<div id="rankingList"></div>
 
-<script>
-  // ご自身で取得したアプリIDをここに入力してください
-  const applicationId = '1054087482094266163';
+<div id="rankingList" class="ranking-container">
+  <!-- Ranking items will be displayed here -->
+</div>
 
-  // APIからデータを取得してHTMLに表示する関数
-  function fetchRankingData() {
-    const apiUrl = 'https://app.rakuten.co.jp/services/api/IchibaItem/Ranking/20170628';
+<script src="test2.js"></script>
 
-    // パラメータのオブジェクトを作成
-    const params = new URLSearchParams({
-      applicationId: applicationId,
-      elements: "rank,shopName,itemUrl,mediumImageUrls,mediumImageUrls",
-      genreId: 567169,
-    });
-
-    // APIを呼び出し、JSONデータを取得
-    fetch(`${apiUrl}?${params}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Network response was not ok');
-          }
-          return response.json();
-        })
-        .then(data => {
-          displayRanking(data);
-        })
-        .catch(error => {
-          console.error('Error fetching data:', error);
-        });
-  }
-
-  // 取得したデータをHTMLに表示する関数
-  function displayRanking(data) {
-    const rankingListContainer = document.getElementById('rankingList');
-    const rankingItems = data.Items;
-
-    if (rankingItems && rankingItems.length > 0) {
-      const listHTML = '<ul>' +
-          rankingItems.map(item => `<li>${item.Item.rank}. <a href="${item.Item.itemUrl}" target="_blank">${item.Item.shopName}</a><img src="${item.Item.mediumImageUrls}"></li>`).join('') +
-          '</ul>';
-
-      rankingListContainer.innerHTML = listHTML;
-    } else {
-      rankingListContainer.innerHTML = '<p>No ranking data available.</p>';
-    }
-  }
-
-  // ページ読み込み時にデータを取得する
-  window.onload = fetchRankingData;
-</script>
 </body>
 </html>

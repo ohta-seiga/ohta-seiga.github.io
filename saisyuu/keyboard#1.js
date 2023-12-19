@@ -25,23 +25,27 @@ function fetchRankingData() {
 }
 
 function displayRanking(data) {
-  let rankingListContainer = document.getElementById('rankingList');
-  let rankingItems = data.Items;
+  let rankingListContainers = document.getElementsByClassName('rankingList');
 
-  if (rankingItems && rankingItems.length > 0) {
-    // 最初の5つの要素だけを取り出す
-    let top5Items = rankingItems.slice(0, 5);
+  for (let i = 0; i < rankingListContainers.length; i++) {
+    let rankingListContainer = rankingListContainers[i];
+    let rankingItems = data.Items;
 
-    let listHTML = top5Items.map(item => `
+    if (rankingItems && rankingItems.length > 0) {
+      // 最初の5つの要素だけを取り出す
+      let top5Items = rankingItems.slice(0, 5);
+
+      let listHTML = top5Items.map(item => `
       <div class="ranking-item">
-        <span class="rank">${item.Item.rank}.</span>
-        <a href="${item.Item.itemUrl}" target="_blank">${item.Item.shopName}</a>
-        <img src="${item.Item.mediumImageUrls[0].imageUrl}">
+        <span class="rank fs-4 ms-1 me-1">${item.Item.rank}</span><br>
+        <a class="rank-name fs-5" href="${item.Item.itemUrl}" target="_blank">${item.Item.shopName}<br>
+        <img src="${item.Item.mediumImageUrls[0].imageUrl}"></a>
       </div>`).join('');
 
-    rankingListContainer.innerHTML = listHTML;
-  } else {
-    rankingListContainer.innerHTML = '<p>No ranking data available.</p>';
+      rankingListContainer.innerHTML = listHTML;
+    } else {
+      rankingListContainer.innerHTML = '<p>No ranking data available.</p>';
+    }
   }
 }
 

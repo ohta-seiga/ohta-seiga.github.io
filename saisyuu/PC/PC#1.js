@@ -6,7 +6,7 @@ function fetchRankingData() {
   let params = new URLSearchParams({
     applicationId: applicationId,
     elements: "rank,shopName,itemUrl,mediumImageUrls[0],mediumImageUrls",
-    genreId: 567169,
+    genreId: 211368,
   });
 
   fetch(`${apiUrl}?${params}`)
@@ -34,9 +34,9 @@ function displayRanking(data) {
 
     let listHTML = top5Items.map(item => `
       <div class="ranking-item">
-        <span class="rank">${item.Item.rank}.</span>
-        <a href="${item.Item.itemUrl}" target="_blank">${item.Item.shopName}</a>
-        <img src="${item.Item.mediumImageUrls[0].imageUrl}">
+        <span class="rank fs-4 ms-1 me-1">${item.Item.rank}</span><br>
+        <a class="rank-name fs-5" href="${item.Item.itemUrl}" target="_blank">${item.Item.shopName}<br>
+        <img src="${item.Item.mediumImageUrls[0].imageUrl}"></a>
       </div>`).join('');
 
     rankingListContainer.innerHTML = listHTML;
