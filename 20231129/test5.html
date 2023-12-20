@@ -1,10 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Title</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>コメント</title>
+  <!-- UIkit CSS -->
+  <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/uikit@3.6.16/dist/css/uikit.min.css"
+  />
+
+  <!-- UIkit JS -->
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.16/dist/js/uikit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.16/dist/js/uikit-icons.min.js"></script>
 </head>
 <body>
+<div class="uk-container uk-padding">
+  <div
+      class="uk-card uk-card-default uk-card-body uk-width-1-2@m uk-margin-auto"
+  >
+    <h2 class="uk-card-title">コメント</h2>
+    <form class="uk-form-stacked" id="commentForm">
+      <div class="uk-margin">
+        <label for="nickname" class="uk-form-label">ニックネーム</label>
+        <div class="uk-form-controls">
+          <input
+              id="nickname"
+              type="text"
+              name="nickname"
+              class="uk-input"
+              placeholder="名無しさん"
+          />
+        </div>
+      </div>
+      <div class="uk-margin">
+        <label for="comment" class="uk-form-label">コメント</label>
+        <div class="uk-form-controls">
+              <textarea
+                  name="comment"
+                  id="comment"
+                  cols="30"
+                  rows="10"
+                  class="uk-textarea"
+                  required
+              ></textarea>
+        </div>
+      </div>
+      <div class="uk-margin-large uk-flex uk-flex-center">
+        <button type="submit" class="uk-button uk-button-primary">
+          コメントする
+        </button>
+      </div>
+    </form>
+    <hr class="uk-divider-icon">
+    <ul class="uk-comment-list" id="commentContainer">
+    </ul>
+  </div>
+</div>
+
 
 <!-- 省略 -->
 
