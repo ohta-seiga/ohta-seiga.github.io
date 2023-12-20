@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
   <div class="option-container">
     <label for="options">選択肢:</label>
     <select id="options">
-      <!-- Options will be dynamically populated from Firestore -->
+      <!-- Options will be dynamically populated from local storage -->
     </select>
     <button type="button" onclick="vote()">投票</button>
   </div>
@@ -39,12 +39,14 @@
 <h2>ランキング</h2>
 <ol id="rankingList"></ol>
 
-<!-- Firebase Firestore SDKを含める -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+<!-- Firebase SDKを含めるためのスクリプトタグを追加 -->
+<script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-firestore.js"></script>
+
 
 <script>
-  // Firebaseの初期化
+  // Firebaseをプロジェクト構成で初期化
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
     apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
     authDomain: "usedevice-fb1ae.firebaseapp.com",
@@ -54,40 +56,34 @@
     appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
     measurementId: "G-1J5585J952"
   };
+
   firebase.initializeApp(firebaseConfig);
 
-  // Firestoreのデータベースを取得
+  // Firestoreデータベースへの参照を取得
   const db = firebase.firestore();
+</script>
 
+<script>
   let votes;
 
-  // Firestoreからデータを取得してランキングを表示する関数
-  function updateRankingFromFirestore() {
-    db.collection('UseDeviceKeyborad').doc('votes').get()
-        .then((doc) => {
-          if (doc.exists) {
-            votes = doc.data();
-          } else {
-            // 初回の場合、デフォルトの選択肢を設定
-            votes = {
-              A: 0,
-              B: 0,
-              C: 0
-            };
-          }
-
-          // オプションのドロップダウンとランキングを更新
-          updateOptions();
-          updateRanking();
-        })
-        .catch((error) => {
-          console.error("Error getting document:", error);
-        });
-  }
-
-  // ページ読み込み時にFirestoreからデータを取得
+  // ページ読み込み時にローカルストレージからデータを読み込む
   window.onload = function() {
-    updateRankingFromFirestore();
+    let storedVotes = localStorage.getItem('votes');
+    if (storedVotes) {
+      votes = JSON.parse(storedVotes);
+    } else {
+      // 初回の場合、デフォルトの選択肢を設定
+      votes = {
+        A: 0,
+        B: 0,
+        C: 0
+      };
+    }
+
+    // 選択肢のドロップダウンリストを更新
+    updateOptions();
+    // ランキングを表示
+    updateRanking();
   };
 
   function vote() {
@@ -95,7 +91,8 @@
     if (!hasAlreadyVoted(selectedOption)) {
       votes[selectedOption]++;
       updateRanking();
-      saveToFirestore();
+      // ローカルストレージにデータを保存
+      saveToLocalStorage();
     } else {
       alert('すでに投票済みです。同じ選択肢には再度投票できません。');
     }
@@ -104,10 +101,13 @@
   function addNewOption() {
     let newOption = document.getElementById('newOption').value.trim();
     if (newOption && !votes.hasOwnProperty(newOption)) {
+      // 新しい選択肢を追加し、デフォルトで1票投票
       votes[newOption] = 1;
       updateOptions();
       document.getElementById('newOption').value = '';
-      saveToFirestore();
+      // ローカルストレージにデータを保存
+      saveToLocalStorage();
+      // ページをリロード
       location.reload();
     }
   }
@@ -131,6 +131,7 @@
 
   function updateRanking() {
     let rankingList = document.getElementById('rankingList');
+    // 投票数の高い順にソート
     let sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
     rankingList.innerHTML = '';
     for (const [option, count] of sortedVotes) {
@@ -140,15 +141,8 @@
     }
   }
 
-  function saveToFirestore() {
-    // Firestoreの 'UseDeviceKeyborad' コレクション内の 'votes' ドキュメントに投票を保存
-    db.collection('UseDeviceKeyborad').doc('votes').set(votes)
-        .then(() => {
-          console.log("Document successfully written!");
-        })
-        .catch((error) => {
-          console.error("Error writing document: ", error);
-        });
+  function saveToLocalStorage() {
+    localStorage.setItem('votes', JSON.stringify(votes));
   }
 
   function handleKeyPress(event) {
@@ -160,6 +154,7 @@
 
 </body>
 </html>
+
 
 
 

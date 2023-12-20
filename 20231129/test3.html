@@ -1,132 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>選択肢投票</title>
-  <style>
-    .option-container {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>コメント</title>
+  <!-- UIkit CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.6.16/dist/css/uikit.min.css" />
+
+  <!-- UIkit JS -->
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.16/dist/js/uikit.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/uikit@3.6.16/dist/js/uikit-icons.min.js"></script>
 </head>
 <body>
-
-<h1>選択肢投票</h1>
-
-<form id="votingForm">
-
-  <div class="option-container">
-    <label for="options">選択肢:</label>
-    <select id="options">
-      <!-- Options will be dynamically populated from local storage -->
-    </select>
-    <button type="button" onclick="vote()">投票</button>
+<div class="uk-container uk-padding">
+  <div class="uk-card uk-card-default uk-card-body uk-width-1-2@m uk-margin-auto">
+    <h2 class="uk-card-title">コメント</h2>
+    <form class="uk-form-stacked" id="commentForm">
+      <div class="uk-margin">
+        <label for="nickname" class="uk-form-label">ニックネーム</label>
+        <div class="uk-form-controls">
+          <input
+              id="nickname"
+              type="text"
+              name="nickname"
+              class="uk-input"
+              placeholder="名無しさん"
+          />
+        </div>
+      </div>
+      <div class="uk-margin">
+        <label for="comment" class="uk-form-label">コメント</label>
+        <div class="uk-form-controls">
+            <textarea
+                name="comment"
+                id="comment"
+                cols="10"
+                rows="5"
+                class="uk-textarea"
+                required
+            ></textarea>
+        </div>
+      </div>
+      <div class="uk-margin-large uk-flex uk-flex-center">
+        <button type="submit" class="uk-button uk-button-primary">
+          コメントする
+        </button>
+      </div>
+    </form>
+    <hr class="uk-divider-icon">
+    <ul class="uk-comment-list" id="commentContainer">
+    </ul>
   </div>
+</div>
 
-  <hr>
-
-  <div class="option-container">
-    <label for="newOption">新しい選択肢:</label>
-    <input type="text" id="newOption" onkeypress="handleKeyPress(event)">
-    <button type="button" onclick="addNewOption()">新しい選択肢を追加</button>
-  </div>
-
-</form>
-
-<h2>投票結果</h2>
-<ul id="resultList"></ul>
+<!-- Firebase JS SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
 
 <script>
-  let votes;
-
-  // ページ読み込み時にローカルストレージからデータを読み込む
-  window.onload = function() {
-    const storedVotes = localStorage.getItem('votes');
-    if (storedVotes) {
-      votes = JSON.parse(storedVotes);
-    } else {
-      // 初回の場合、デフォルトの選択肢を設定
-      votes = {
-        A: 0,
-        B: 0,
-        C: 0
-      };
-    }
-
-    // 選択肢のドロップダウンリストを更新
-    updateOptions();
-    // 投票結果を表示
-    updateResults();
-  };
-
-  function vote() {
-    const selectedOption = document.getElementById('options').value;
-    if (!hasAlreadyVoted(selectedOption)) {
-      votes[selectedOption]++;
-      updateResults();
-      // ローカルストレージにデータを保存
-      saveToLocalStorage();
-    } else {
-      alert('すでに投票済みです。同じ選択肢には再度投票できません。');
-    }
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
+    authDomain: "usedevice-fb1ae.firebaseapp.com",
+    projectId: "usedevice-fb1ae",
+    storageBucket: "usedevice-fb1ae.appspot.com",
+    messagingSenderId: "935424391366",
+    appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
+    measurementId: "G-1J5585J952"
   }
 
-  function addNewOption() {
-    const newOption = document.getElementById('newOption').value.trim();
-    if (newOption && !votes.hasOwnProperty(newOption)) {
-      // 新しい選択肢を追加し、デフォルトで1票投票
-      votes[newOption] = 1;
-      updateOptions();
-      document.getElementById('newOption').value = '';
-      // ローカルストレージにデータを保存
-      saveToLocalStorage();
-      // ページをリロード
-      location.reload();
-    }
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  const form = document.getElementById("commentForm");
+  const nicknameInput = document.getElementById("nickname");
+  const commentInput = document.getElementById("comment");
+  const commentContainer = document.getElementById("commentContainer");
+
+  // Firestore instance
+  const db = firebase.firestore();
+
+  // Load comments on page load
+  window.addEventListener("load", () => {
+    updateComment();
+  });
+
+  form.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+
+    const formData = {
+      nickname: nicknameInput.value || "名無しのジャクソン",
+      comment: commentInput.value,
+      votes: 0, // Initialize votes to 0
+    };
+
+    db.collection("comments").add(formData)
+        .then((docRef) => {
+          console.log("送信されました");
+          nicknameInput.value = "";
+          commentInput.value = "";
+
+          const newComment = { ...formData, id: docRef.id };
+          updateComment(newComment);
+        })
+        .catch((err) => {
+          console.error("エラーが発生しました：", err);
+        });
+  });
+
+  function updateComment(newComment) {
+    db.collection("comments").get()
+        .then((querySnapshot) => {
+          const comments = [];
+
+          querySnapshot.forEach((doc) => {
+            const comment = doc.data();
+            comment.id = doc.id;
+
+            comments.push(comment);
+          });
+
+          if (newComment) {
+            comments.push(newComment);
+          }
+
+          // Sort comments based on votes in descending order
+          comments.sort((a, b) => b.votes - a.votes);
+
+          renderComment(comments);
+        });
   }
 
-  function hasAlreadyVoted(selectedOption) {
-    return votes[selectedOption] > 0;
+  function renderComment(comments) {
+    commentContainer.innerHTML = '';
+    comments.forEach((comment) => {
+      commentContainer.innerHTML += createCommentNode(comment);
+    });
   }
 
-  function updateOptions() {
-    const optionsSelect = document.getElementById('options');
-    optionsSelect.innerHTML = '';
-    for (const option in votes) {
-      if (votes.hasOwnProperty(option)) {
-        const optionElement = document.createElement('option');
-        optionElement.value = option;
-        optionElement.text = option;
-        optionsSelect.appendChild(optionElement);
-      }
-    }
+  function createCommentNode(comment) {
+    return `<li>
+        <div class="uk-comment uk-comment-primary">
+          <div class="uk-comment-header">
+            <h5 class="uk-comment-title">${comment.nickname}</h5>
+          </div>
+          <div class="uk-comment-body">
+            ${comment.comment}
+          </div>
+          <div class="uk-margin">
+            <button class="uk-button uk-button-secondary" onclick="voteComment('${comment.id}')">
+              投票
+            </button>
+            <span class="uk-label uk-label-success">${comment.votes || 0} 投票数</span>
+          </div>
+        </div>
+      </li>`;
   }
 
-  function updateResults() {
-    const resultList = document.getElementById('resultList');
-    resultList.innerHTML = '';
-    for (const option in votes) {
-      if (votes.hasOwnProperty(option)) {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${option}: ${votes[option]}票`;
-        resultList.appendChild(listItem);
-      }
-    }
-  }
+  function voteComment(commentId) {
+    const commentRef = db.collection("comments").doc(commentId);
 
-  function saveToLocalStorage() {
-    localStorage.setItem('votes', JSON.stringify(votes));
-  }
+    commentRef.get()
+        .then((doc) => {
+          if (doc.exists) {
+            const currentVotes = doc.data().votes || 0;
 
-  function handleKeyPress(event) {
-    if (event.key === 'Enter') {
-      addNewOption();
-    }
+            commentRef.update({ votes: currentVotes + 1 })
+                .then(() => {
+                  console.log("Vote recorded");
+                  updateComment();
+                })
+                .catch((err) => {
+                  console.error("Error updating votes:", err);
+                });
+          } else {
+            console.error("Comment not found");
+          }
+        })
+        .catch((err) => {
+          console.error("Error getting document:", err);
+        });
   }
 </script>
-
 </body>
 </html>
