@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
   <div class="option-container">
     <label for="options">選択肢:</label>
     <select id="options">
-      <!-- Options will be dynamically populated from Firestore -->
+      <!-- Options will be dynamically populated from Firebase -->
     </select>
     <button type="button" onclick="vote()">投票</button>
   </div>
@@ -36,38 +36,52 @@
 
 </form>
 
-<h2>投票結果</h2>
-<ul id="resultList"></ul>
+<h2>ランキング</h2>
+<ol id="rankingList"></ol>
+
+<!-- Firebase SDKを含める -->
+<script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-database.js"></script>
 
 <script>
-  let votes;
-  let db;
-
-  window.onload = function() {
-    // Firebase Firestore の初期化
-    db = firebase.firestore();
-
-    // Firestore からデータを取得
-    db.collection('votes').onSnapshot((snapshot) => {
-      votes = {};
-      snapshot.forEach((doc) => {
-        votes[doc.id] = doc.data().count;
-      });
-
-      updateOptions();
-      updateResults();
-    });
+  // これらの値をFirebaseプロジェクトの構成に置き換えてください
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
+    authDomain: "usedevice-fb1ae.firebaseapp.com",
+    projectId: "usedevice-fb1ae",
+    storageBucket: "usedevice-fb1ae.appspot.com",
+    messagingSenderId: "935424391366",
+    appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
+    measurementId: "G-1J5585J952"
   };
+
+  // Firebaseを初期化
+  firebase.initializeApp(firebaseConfig);
+
+  // Firebaseデータベースへの参照
+  const database = firebase.database();
+
+  let votes;
+
+  // ページ読み込み時にFirebaseからデータを取得
+  firebase.database().ref('votes').once('value').then(function(snapshot) {
+    votes = snapshot.val() || {
+      A: 0,
+      B: 0,
+      C: 0
+    };
+
+    // オプションのドロップダウン、ランキング、表示を更新
+    updateOptions();
+    updateRanking();
+  });
 
   function vote() {
     let selectedOption = document.getElementById('options').value;
     if (!hasAlreadyVoted(selectedOption)) {
-      // 選択肢の投票数をインクリメント
-      db.collection('votes').doc(selectedOption).update({
-        count: firebase.firestore.FieldValue.increment(1)
-      });
-
-      saveToLocalStorage();
+      votes[selectedOption]++;
+      updateRanking();
+      saveToFirebase();
     } else {
       alert('すでに投票済みです。同じ選択肢には再度投票できません。');
     }
@@ -76,12 +90,11 @@
   function addNewOption() {
     let newOption = document.getElementById('newOption').value.trim();
     if (newOption && !votes.hasOwnProperty(newOption)) {
-      // 新しい選択肢を追加
-      db.collection('votes').doc(newOption).set({
-        count: 1
-      });
-
+      votes[newOption] = 1;
+      updateOptions();
       document.getElementById('newOption').value = '';
+      saveToFirebase();
+      location.reload();
     }
   }
 
@@ -102,20 +115,20 @@
     }
   }
 
-  function updateResults() {
-    let resultList = document.getElementById('resultList');
-    resultList.innerHTML = '';
-    for (const option in votes) {
-      if (votes.hasOwnProperty(option)) {
-        const listItem = document.createElement('li');
-        listItem.textContent = `${option}: ${votes[option]}票`;
-        resultList.appendChild(listItem);
-      }
+  function updateRanking() {
+    let rankingList = document.getElementById('rankingList');
+    let sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    rankingList.innerHTML = '';
+    for (const [option, count] of sortedVotes) {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${option}: ${count}票`;
+      rankingList.appendChild(listItem);
     }
   }
 
-  function saveToLocalStorage() {
-    // ローカルストレージには保存しない（Firebase にデータが保存されているため）
+  function saveToFirebase() {
+    // Firebaseの 'votes' ノードに投票を保存
+    firebase.database().ref('votes').set(votes);
   }
 
   function handleKeyPress(event) {
@@ -125,29 +138,8 @@
   }
 </script>
 
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
-    authDomain: "usedevice-fb1ae.firebaseapp.com",
-    projectId: "usedevice-fb1ae",
-    storageBucket: "usedevice-fb1ae.appspot.com",
-    messagingSenderId: "935424391366",
-    appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
-    measurementId: "G-1J5585J952"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
 </body>
 </html>
+
+
 
