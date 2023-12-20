@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
   <div class="option-container">
     <label for="options">選択肢:</label>
     <select id="options">
-      <!-- Options will be dynamically populated from local storage -->
+      <!-- Options will be dynamically populated from Firestore -->
     </select>
     <button type="button" onclick="vote()">投票</button>
   </div>
@@ -41,33 +41,32 @@
 
 <script>
   let votes;
+  let db;
 
-  // ページ読み込み時にローカルストレージからデータを読み込む
   window.onload = function() {
-    const storedVotes = localStorage.getItem('votes');
-    if (storedVotes) {
-      votes = JSON.parse(storedVotes);
-    } else {
-      // 初回の場合、デフォルトの選択肢を設定
-      votes = {
-        A: 0,
-        B: 0,
-        C: 0
-      };
-    }
+    // Firebase Firestore の初期化
+    db = firebase.firestore();
 
-    // 選択肢のドロップダウンリストを更新
-    updateOptions();
-    // 投票結果を表示
-    updateResults();
+    // Firestore からデータを取得
+    db.collection('votes').onSnapshot((snapshot) => {
+      votes = {};
+      snapshot.forEach((doc) => {
+        votes[doc.id] = doc.data().count;
+      });
+
+      updateOptions();
+      updateResults();
+    });
   };
 
   function vote() {
-    const selectedOption = document.getElementById('options').value;
+    let selectedOption = document.getElementById('options').value;
     if (!hasAlreadyVoted(selectedOption)) {
-      votes[selectedOption]++;
-      updateResults();
-      // ローカルストレージにデータを保存
+      // 選択肢の投票数をインクリメント
+      db.collection('votes').doc(selectedOption).update({
+        count: firebase.firestore.FieldValue.increment(1)
+      });
+
       saveToLocalStorage();
     } else {
       alert('すでに投票済みです。同じ選択肢には再度投票できません。');
@@ -75,16 +74,14 @@
   }
 
   function addNewOption() {
-    const newOption = document.getElementById('newOption').value.trim();
+    let newOption = document.getElementById('newOption').value.trim();
     if (newOption && !votes.hasOwnProperty(newOption)) {
-      // 新しい選択肢を追加し、デフォルトで1票投票
-      votes[newOption] = 1;
-      updateOptions();
+      // 新しい選択肢を追加
+      db.collection('votes').doc(newOption).set({
+        count: 1
+      });
+
       document.getElementById('newOption').value = '';
-      // ローカルストレージにデータを保存
-      saveToLocalStorage();
-      // ページをリロード
-      location.reload();
     }
   }
 
@@ -93,7 +90,7 @@
   }
 
   function updateOptions() {
-    const optionsSelect = document.getElementById('options');
+    let optionsSelect = document.getElementById('options');
     optionsSelect.innerHTML = '';
     for (const option in votes) {
       if (votes.hasOwnProperty(option)) {
@@ -106,7 +103,7 @@
   }
 
   function updateResults() {
-    const resultList = document.getElementById('resultList');
+    let resultList = document.getElementById('resultList');
     resultList.innerHTML = '';
     for (const option in votes) {
       if (votes.hasOwnProperty(option)) {
@@ -118,7 +115,7 @@
   }
 
   function saveToLocalStorage() {
-    localStorage.setItem('votes', JSON.stringify(votes));
+    // ローカルストレージには保存しない（Firebase にデータが保存されているため）
   }
 
   function handleKeyPress(event) {
@@ -128,5 +125,29 @@
   }
 </script>
 
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
+    authDomain: "usedevice-fb1ae.firebaseapp.com",
+    projectId: "usedevice-fb1ae",
+    storageBucket: "usedevice-fb1ae.appspot.com",
+    messagingSenderId: "935424391366",
+    appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
+    measurementId: "G-1J5585J952"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 </body>
 </html>
+
