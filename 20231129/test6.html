@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>選択肢投票</title>
+  <style>
+    .option-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>選択肢投票</h1>
+
+<form id="votingForm">
+
+  <div class="option-container">
+    <label for="options">選択肢:</label>
+    <select id="options">
+      <!-- Options will be dynamically populated from Firestore -->
+    </select>
+    <button type="button" onclick="vote()">投票</button>
+  </div>
+
+  <hr>
+
+  <div class="option-container">
+    <label for="newOption">新しい選択肢:</label>
+    <input type="text" id="newOption" onkeypress="handleKeyPress(event)">
+    <button type="button" onclick="addNewOption()">新しい選択肢を追加</button>
+  </div>
+
+</form>
+
+<h2>ランキング</h2>
+<ol id="rankingList"></ol>
+
+<!-- Firebase Firestore SDKを含める -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+<script>
+  // Firebaseの初期化
+  const firebaseConfig = {
+    apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
+    authDomain: "usedevice-fb1ae.firebaseapp.com",
+    projectId: "usedevice-fb1ae",
+    storageBucket: "usedevice-fb1ae.appspot.com",
+    messagingSenderId: "935424391366",
+    appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
+    measurementId: "G-1J5585J952"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  // Firestoreのデータベースを取得
+  const db = firebase.firestore();
+
+  let votes;
+
+  // Firestoreからデータを取得してランキングを表示する関数
+  function updateRankingFromFirestore() {
+    db.collection('votingData').doc('votes').onSnapshot((doc) => {
+      if (doc.exists) {
+        votes = doc.data();
+      } else {
+        // 初回の場合、デフォルトの選択肢を設定
+        votes = {
+          A: 0,
+          B: 0,
+          C: 0
+        };
+      }
+
+      // オプションのドロップダウンとランキングを更新
+      updateOptions();
+      updateRanking();
+    });
+  }
+
+  // ページ読み込み時にFirestoreからデータを取得
+  window.onload = function() {
+    updateRankingFromFirestore();
+  };
+
+  function vote() {
+    let selectedOption = document.getElementById('options').value;
+    if (!hasAlreadyVoted(selectedOption)) {
+      votes[selectedOption]++;
+      updateRanking();
+      saveToFirestore();
+    } else {
+      alert('すでに投票済みです。同じ選択肢には再度投票できません。');
+    }
+  }
+
+  function addNewOption() {
+    let newOption = document.getElementById('newOption').value.trim();
+    if (newOption && !votes.hasOwnProperty(newOption)) {
+      votes[newOption] = 1;
+      updateOptions();
+      document.getElementById('newOption').value = '';
+      saveToFirestore();
+      location.reload();
+    }
+  }
+
+  function hasAlreadyVoted(selectedOption) {
+    return votes[selectedOption] > 0;
+  }
+
+  function updateOptions() {
+    let optionsSelect = document.getElementById('options');
+    optionsSelect.innerHTML = '';
+    for (const option in votes) {
+      if (votes.hasOwnProperty(option)) {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.text = option;
+        optionsSelect.appendChild(optionElement);
+      }
+    }
+  }
+
+  function updateRanking() {
+    let rankingList = document.getElementById('rankingList');
+    let sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    rankingList.innerHTML = '';
+    for (const [option, count] of sortedVotes) {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${option}: ${count}票`;
+      rankingList.appendChild(listItem);
+    }
+  }
+
+  function saveToFirestore() {
+    // Firestoreの 'votingData' コレクション内の 'votes' ドキュメントに投票を保存
+    db.collection('votingData').doc('votes').set(votes)
+        .then(() => {
+          console.log("Document successfully written!");
+        })
+        .catch((error) => {
+          console.error("Error writing document: ", error);
+        });
+  }
+
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      addNewOption();
+    }
+  }
+</script>
+
+</body>
+</html>
