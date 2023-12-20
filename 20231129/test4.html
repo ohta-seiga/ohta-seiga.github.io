@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
   <div class="option-container">
     <label for="options">選択肢:</label>
     <select id="options">
-      <!-- Options will be dynamically populated from Firebase -->
+      <!-- Options will be dynamically populated from Firestore -->
     </select>
     <button type="button" onclick="vote()">投票</button>
   </div>
@@ -39,12 +39,12 @@
 <h2>ランキング</h2>
 <ol id="rankingList"></ol>
 
-<!-- Firebase SDKを含める -->
-<script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.3.0/firebase-database.js"></script>
+<!-- Firebase Firestore SDKを含める -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 
 <script>
-  // これらの値をFirebaseプロジェクトの構成に置き換えてください
+  // Firebaseの初期化
   const firebaseConfig = {
     apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
     authDomain: "usedevice-fb1ae.firebaseapp.com",
@@ -52,36 +52,50 @@
     storageBucket: "usedevice-fb1ae.appspot.com",
     messagingSenderId: "935424391366",
     appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
-    measurementId: "G-1J5585J952",
+    measurementId: "G-1J5585J952"
   };
-
-  // Firebaseを初期化
   firebase.initializeApp(firebaseConfig);
 
-  // Firebaseデータベースへの参照
-  const database = firebase.database();
+  // Firestoreのデータベースを取得
+  const db = firebase.firestore();
 
   let votes;
 
-  // ページ読み込み時にFirebaseからデータを取得
-  firebase.database().ref('votes').once('value').then(function(snapshot) {
-    votes = snapshot.val() || {
-      A: 0,
-      B: 0,
-      C: 0
-    };
+  // Firestoreからデータを取得してランキングを表示する関数
+  function updateRankingFromFirestore() {
+    db.collection('UseDeviceKeyborad').doc('votes').get()
+        .then((doc) => {
+          if (doc.exists) {
+            votes = doc.data();
+          } else {
+            // 初回の場合、デフォルトの選択肢を設定
+            votes = {
+              A: 0,
+              B: 0,
+              C: 0
+            };
+          }
 
-    // オプションのドロップダウン、ランキング、表示を更新
-    updateOptions();
-    updateRanking();
-  });
+          // オプションのドロップダウンとランキングを更新
+          updateOptions();
+          updateRanking();
+        })
+        .catch((error) => {
+          console.error("Error getting document:", error);
+        });
+  }
+
+  // ページ読み込み時にFirestoreからデータを取得
+  window.onload = function() {
+    updateRankingFromFirestore();
+  };
 
   function vote() {
     let selectedOption = document.getElementById('options').value;
     if (!hasAlreadyVoted(selectedOption)) {
       votes[selectedOption]++;
       updateRanking();
-      saveToFirebase();
+      saveToFirestore();
     } else {
       alert('すでに投票済みです。同じ選択肢には再度投票できません。');
     }
@@ -93,7 +107,7 @@
       votes[newOption] = 1;
       updateOptions();
       document.getElementById('newOption').value = '';
-      saveToFirebase();
+      saveToFirestore();
       location.reload();
     }
   }
@@ -126,9 +140,15 @@
     }
   }
 
-  function saveToFirebase() {
-    // Firebaseの 'votes' ノードに投票を保存
-    firebase.database().ref('votes').set(votes);
+  function saveToFirestore() {
+    // Firestoreの 'UseDeviceKeyborad' コレクション内の 'votes' ドキュメントに投票を保存
+    db.collection('UseDeviceKeyborad').doc('votes').set(votes)
+        .then(() => {
+          console.log("Document successfully written!");
+        })
+        .catch((error) => {
+          console.error("Error writing document: ", error);
+        });
   }
 
   function handleKeyPress(event) {
@@ -140,6 +160,8 @@
 
 </body>
 </html>
+
+
 
 
 
