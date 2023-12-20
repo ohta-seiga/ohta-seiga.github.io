@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>選択肢投票</title>
+  <style>
+    .option-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>選択肢投票</h1>
+
+  <form id="votingForm">
+
+    <div class="option-container">
+      <label for="options">選択肢:</label>
+      <select id="options">
+        <!-- Options will be dynamically populated from local storage -->
+      </select>
+      <button type="button" onclick="vote()">投票</button>
+    </div>
+
+    <hr>
+
+    <div class="option-container">
+      <label for="newOption">新しい選択肢:</label>
+      <input type="text" id="newOption" onkeypress="handleKeyPress(event)">
+      <button type="button" onclick="addNewOption()">新しい選択肢を追加</button>
+    </div>
+
+  </form>
+
+  <h2>投票結果</h2>
+  <ul id="resultList"></ul>
+
+  <script>
+    let votes;
+
+    // ページ読み込み時にローカルストレージからデータを読み込む
+    window.onload = function() {
+      const storedVotes = localStorage.getItem('votes');
+      if (storedVotes) {
+        votes = JSON.parse(storedVotes);
+      } else {
+        // 初回の場合、デフォルトの選択肢を設定
+        votes = {
+          A: 0,
+          B: 0,
+          C: 0
+        };
+      }
+
+      // 選択肢のドロップダウンリストを更新
+      updateOptions();
+      // 投票結果を表示
+      updateResults();
+    };
+
+    function vote() {
+      const selectedOption = document.getElementById('options').value;
+      if (!hasAlreadyVoted(selectedOption)) {
+        votes[selectedOption]++;
+        updateResults();
+        // ローカルストレージにデータを保存
+        saveToLocalStorage();
+      } else {
+        alert('すでに投票済みです。同じ選択肢には再度投票できません。');
+      }
+    }
+
+    function addNewOption() {
+      const newOption = document.getElementById('newOption').value.trim();
+      if (newOption && !votes.hasOwnProperty(newOption)) {
+        // 新しい選択肢を追加し、デフォルトで1票投票
+        votes[newOption] = 1;
+        updateOptions();
+        document.getElementById('newOption').value = '';
+        // ローカルストレージにデータを保存
+        saveToLocalStorage();
+        // ページをリロード
+        location.reload();
+      }
+    }
+
+    function hasAlreadyVoted(selectedOption) {
+      return votes[selectedOption] > 0;
+    }
+
+    function updateOptions() {
+      const optionsSelect = document.getElementById('options');
+      optionsSelect.innerHTML = '';
+      for (const option in votes) {
+        if (votes.hasOwnProperty(option)) {
+          const optionElement = document.createElement('option');
+          optionElement.value = option;
+          optionElement.text = option;
+          optionsSelect.appendChild(optionElement);
+        }
+      }
+    }
+
+    function updateResults() {
+      const resultList = document.getElementById('resultList');
+      resultList.innerHTML = '';
+      for (const option in votes) {
+        if (votes.hasOwnProperty(option)) {
+          const listItem = document.createElement('li');
+          listItem.textContent = `${option}: ${votes[option]}票`;
+          resultList.appendChild(listItem);
+        }
+      }
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem('votes', JSON.stringify(votes));
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        addNewOption();
+      }
+    }
+  </script>
+
+</body>
+</html>
