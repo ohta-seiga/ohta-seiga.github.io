@@ -1,4 +1,4 @@
-const applicationId = '1054087482094266163';
+
 
 function fetchRankingData() {
   let apiUrl = 'https://app.rakuten.co.jp/services/api/IchibaItem/Ranking/20170628';

@@ -161,7 +161,7 @@ sp-nav(ナビ)
   position: fixed;
   left: -100%; /*ハンバーガーがクリックされる前はWindow右側に隠す*/
   top: 0;
-  width: 70%; /* 出てくるスライドメニューの幅 */
+  width: 65%; /* 出てくるスライドメニューの幅 */
   height: 100vh;
   background-color: #fff;
   transition: all 0.5s;
