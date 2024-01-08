@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>選択肢投票</title>
+  <style>
+    .option-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+  </style>
+
+  <!-- Firebase JS SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "usedevice-fb1ae",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID",
+      measurementId: "YOUR_MEASUREMENT_ID"
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Firestore instance
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+
+<h1>選択肢投票</h1>
+
+<form id="votingForm">
+
+  <div class="option-container">
+    <label for="options">選択肢:</label>
+    <select id="options">
+      <!-- Options will be dynamically populated from Firebase -->
+    </select>
+    <button type="button" onclick="vote()">投票</button>
+  </div>
+
+  <hr>
+
+  <div class="option-container">
+    <label for="newOption">新しい選択肢:</label>
+    <input type="text" id="newOption" onkeypress="handleKeyPress(event)">
+    <button type="button" onclick="addNewOption()">新しい選択肢を追加</button>
+  </div>
+
+</form>
+
+<h2>ランキング</h2>
+<ol id="rankingList"></ol>
+
+<script>
+  let votes;
+
+  // ページ読み込み時にFirebaseからデータを読み込む
+  window.onload = function() {
+    // Initialize votes as an empty object
+    votes = {};
+
+    // Load existing votes from Firebase
+    db.collection("votes").onSnapshot((snapshot) => {
+      snapshot.forEach((doc) => {
+        votes[doc.id] = doc.data().count;
+      });
+
+      // Update options and ranking
+      updateOptions();
+      updateRanking();
+    });
+  };
+
+  function vote() {
+    let selectedOption = document.getElementById('options').value;
+    if (!hasAlreadyVoted(selectedOption)) {
+      // Increment vote count for the selected option in Firebase
+      db.collection("votes").doc(selectedOption).update({
+        count: firebase.firestore.FieldValue.increment(1)
+      });
+
+      // Update ranking
+      updateRanking();
+    } else {
+      alert('すでに投票済みです。同じ選択肢には再度投票できません。');
+    }
+  }
+
+  function addNewOption() {
+    let newOption = document.getElementById('newOption').value.trim();
+    if (newOption && !votes.hasOwnProperty(newOption)) {
+      // Add new option to Firebase with an initial count of 1
+      db.collection("votes").doc(newOption).set({
+        count: 1
+      });
+
+      // Update options and ranking
+      updateOptions();
+      updateRanking();
+    }
+  }
+
+  function hasAlreadyVoted(selectedOption) {
+    return votes[selectedOption] > 0;
+  }
+
+  function updateOptions() {
+    let optionsSelect = document.getElementById('options');
+    optionsSelect.innerHTML = '';
+    for (const option in votes) {
+      if (votes.hasOwnProperty(option)) {
+        const optionElement = document.createElement('option');
+        optionElement.value = option;
+        optionElement.text = option;
+        optionsSelect.appendChild(optionElement);
+      }
+    }
+  }
+
+  function updateRanking() {
+    let rankingList = document.getElementById('rankingList');
+    // Sort options by vote count in descending order
+    let sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    rankingList.innerHTML = '';
+    for (const [option, count] of sortedVotes) {
+      const listItem = document.createElement('li');
+      listItem.textContent = `${option}: ${count}票`;
+      rankingList.appendChild(listItem);
+    }
+  }
+</script>
+
+</body>
+</html>
