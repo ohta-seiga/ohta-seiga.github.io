@@ -99,7 +99,7 @@
 
   function addNewOption() {
     let newOption = document.getElementById('newOption').value.trim();
-    if (newOption && !votes.hasOwnProperty(newOption)) {
+    if (newOption) {
       // Add new option to Firebase with an initial count of 1
       db.collection("votes").doc(newOption).set({
         count: 1
@@ -120,12 +120,16 @@
     optionsSelect.innerHTML = '';
     for (const option in votes) {
       if (votes.hasOwnProperty(option)) {
-        const optionElement = document.createElement('option');
-        optionElement.value = option;
-        optionElement.text = option;
-        optionsSelect.appendChild(optionElement);
+        addOptionToSelect(optionsSelect, option);
       }
     }
+  }
+
+  function addOptionToSelect(selectElement, option) {
+    const optionElement = document.createElement('option');
+    optionElement.value = option;
+    optionElement.text = option;
+    selectElement.appendChild(optionElement);
   }
 
   function updateRanking() {
