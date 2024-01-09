@@ -198,3 +198,9 @@ black-bg(ハンバーガーメニュー解除用bg)
   opacity: 0.3;
   visibility: visible;
 }
+
+.option-container {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}

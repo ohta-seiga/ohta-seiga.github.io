@@ -63,17 +63,18 @@
 <ol id="rankingList"></ol>
 
 <script>
-  let votes;
+  let keyboard;
+  let userkeyboard = JSON.parse(localStorage.getItem('userkeyboard')) || {};
 
   // ページ読み込み時にFirebaseからデータを読み込む
   window.onload = function() {
     // Initialize votes as an empty object
-    votes = {};
+    keyboard = {};
 
     // Load existing votes from Firebase
-    db.collection("votes").onSnapshot((snapshot) => {
+    db.collection("keyboard").onSnapshot((snapshot) => {
       snapshot.forEach((doc) => {
-        votes[doc.id] = doc.data().count;
+        keyboard[doc.id] = doc.data().count;
       });
 
       // Update options and ranking
@@ -84,11 +85,16 @@
 
   function vote() {
     let selectedOption = document.getElementById('options').value;
+
     if (!hasAlreadyVoted(selectedOption)) {
       // Increment vote count for the selected option in Firebase
-      db.collection("votes").doc(selectedOption).update({
+      db.collection("keyboard").doc(selectedOption).update({
         count: firebase.firestore.FieldValue.increment(1)
       });
+
+      // Update user's voted options in localStorage
+      userkeyboard[selectedOption] = true;
+      localStorage.setItem('userkeyboard', JSON.stringify(userkeyboard));
 
       // Update ranking
       updateRanking();
@@ -100,10 +106,13 @@
   function addNewOption() {
     let newOption = document.getElementById('newOption').value.trim();
     if (newOption) {
-      // Add new option to Firebase with an initial count of 1
-      db.collection("votes").doc(newOption).set({
-        count: 1
+      // Add new option to Firebase with an initial count of 0
+      db.collection("keyboard").doc(newOption).set({
+        count: 0
       });
+
+      // Vote for the newly added option
+      voteForOption(newOption);
 
       // Update options and ranking
       updateOptions();
@@ -111,15 +120,26 @@
     }
   }
 
+  function voteForOption(option) {
+    // Increment vote count for the selected option in Firebase
+    db.collection("keyboard").doc(option).update({
+      count: firebase.firestore.FieldValue.increment(1)
+    });
+
+    // Update user's voted options in localStorage
+    userkeyboard[option] = true;
+    localStorage.setItem('userkeyboard', JSON.stringify(userkeyboard));
+  }
+
   function hasAlreadyVoted(selectedOption) {
-    return votes[selectedOption] > 0;
+    return userkeyboard[selectedOption];
   }
 
   function updateOptions() {
     let optionsSelect = document.getElementById('options');
     optionsSelect.innerHTML = '';
-    for (const option in votes) {
-      if (votes.hasOwnProperty(option)) {
+    for (const option in keyboard) {
+      if (keyboard.hasOwnProperty(option)) {
         addOptionToSelect(optionsSelect, option);
       }
     }
@@ -135,12 +155,18 @@
   function updateRanking() {
     let rankingList = document.getElementById('rankingList');
     // Sort options by vote count in descending order
-    let sortedVotes = Object.entries(votes).sort((a, b) => b[1] - a[1]);
+    let sortedVotes = Object.entries(keyboard).sort((a, b) => b[1] - a[1]);
     rankingList.innerHTML = '';
     for (const [option, count] of sortedVotes) {
       const listItem = document.createElement('li');
       listItem.textContent = `${option}: ${count}票`;
       rankingList.appendChild(listItem);
+    }
+  }
+
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      addNewOption();
     }
   }
 </script>

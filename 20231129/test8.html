@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TELKYW4T32"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-TELKYW4T32');
+  </script>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+  <link rel="stylesheet" href="../style001.css">
+  <title>ゲーマーの道</title>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5159669691489990"
+          crossorigin="anonymous"></script>
+
+  <!-- Firebase JS SDK -->
+  <script src="https://www.gstatic.com/firebasejs/8.2.6/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.2.1/firebase-firestore.js"></script>
+
+  <script>
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCfIVSo4G0PVtmLIDnrbWRBUrglwPoQT0o",
+      authDomain: "usedevice-fb1ae.firebaseapp.com",
+      projectId: "usedevice-fb1ae",
+      storageBucket: "usedevice-fb1ae.appspot.com",
+      messagingSenderId: "935424391366",
+      appId: "1:935424391366:web:0d8b98e8525c7280523fc7",
+      measurementId: "G-1J5585J952"
+    }
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Firestore instance
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+<div class="d-none d-sm-none d-md-block">
+  <div class="container-fluid p-0">
+    <div class="row bg-secondary text-light m-0">
+      <h6 class="ps-3 pt-1">ゲーム環境を作るためのロードマップ</h6>
+    </div>
+    <div class="row m-0">
+      <div class="col-4 mt-3"><a href="../TOP.html"><img src="../rogo0102.png" alt="top画" class="logo"></a></div>
+      <div class="col-8">
+        <div class="row">
+          <div class="col-auto m-2 pt-4">
+            <p><a class="link-offset-2 link-dark link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-4" href="../TOP.html">ホーム</a></p>
+          </div>
+          <div class="col-auto m-2 pt-4">
+            <p><a class="link-offset-2 link-dark link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-4" href="../PC/PC.html">PC</a></p>
+          </div>
+          <div class="col-auto m-2 pt-4">
+            <p><a class="link-offset-2 link-dark link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-4" href="../earphone.html">イヤホン</a></p>
+          </div>
+          <div class="col-auto m-2 pt-4">
+            <p><a class="link-offset-2 link-dark link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-4" href="../mouse.html">マウス</a></p>
+          </div>
+          <div class="col-auto m-2 pt-4">
+            <p><a class="link-offset-2 link-dark link-offset-3-hover link-underline link-underline-opacity-0 link-underline-opacity-75-hover fs-4" href="keyboard.html">キーボード</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-none d-sm-none d-md-none d-lg-block">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="m-0 ms-5">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="../TOP.html">Home</a></li>
+      <li class="breadcrumb-item"><a href="../PC/PC.html">PC</a></li>
+      <li class="breadcrumb-item active" aria-current="page">みんなの使用デバイス「ゲーミングキーボード」編</li>
+    </ol>
+  </nav>
+  <div class="container">
+    <div class="row mt-5">
+      <div class="col-md-9">
+
+
+<h1>選択肢投票</h1>
+
+<form id="votingForm">
+
+  <div class="option-container">
+    <label for="options">選択肢:</label>
+    <select id="options">
+      <!-- Options will be dynamically populated from Firebase -->
+    </select>
+    <button type="button" onclick="vote()">投票</button>
+  </div>
+
+  <hr>
+
+  <div class="option-container">
+    <label for="newOption">新しい選択肢:</label>
+    <input type="text" autocomplete="off" id="newOption" onkeypress="handleKeyPress(event)">
+    <button type="button" onclick="addNewOption()">新しい選択肢を追加</button>
+  </div>
+
+</form>
+
+<h2>ランキング</h2>
+<ol id="rankingList"></ol>
+      </div>
+      <div class="col-md-3 mt-5">
+        <div class="thumbnail profile">
+          <img src="https://placehold.jp/300x185.png" alt="参考画像" style="width:100%">
+          <div class="d-grid gap-2 col-auto mx-auto topic">
+            <p class="fs-1 border-bottom">name</p>
+          </div>
+          <div class="row">
+            <p>FPSゲームプレイ歴6年</p>
+            <p>APEXのプレイ時間は1500時間以上</p>
+            <p class="mb-5">ゲームライフを充実させるために日々、周辺機器などの情報を収集してます！</p>
+            <div class="col-md-auto"><img src="../共有アイコン1.png" alt="共有" class="lgicon"></div>
+            <div class="col-md-auto"><img src="../FACEBOOK風のアイコン素材%20その3.png" alt="Facebook" class="lgicon"></div>
+            <div class="col-md-auto"><img src="../twitterのアイコン素材%20その2.png" alt="twitter" class="lgicon"></div>
+          </div>
+          <div class="row mt-4">
+            <p class="fs-3 mb-1">カテゴリー</p>
+            <p class="border-bottom"></p>
+            <ul class="list-group ms-2 mb-3">
+              <li class="list-group-item"><a href="../PC/PC.html">PC</a></li>
+              <li class="list-group-item"><a href="../earphone.html">イヤホン</a></li>
+              <li class="list-group-item"><a href="../mouse.html">マウス</a></li>
+              <li class="list-group-item"><a href="keyboard.html">キーボード</a></li>
+            </ul>
+          </div>
+          <div class="row top mb-3">
+            <p class="border-bottom"></p>
+            <p class="fs-3 m-1">おすすめ記事</p>
+            <div class="col-12 m-2">
+              <div class="row">
+                <div class="col-6 pe-0"><img src="https://placehold.jp/250x180.png" alt="広告1" style="width:100%"></div>
+                <div class="col-6">タイトル</div>
+              </div>
+            </div>
+            <div class="col-12 m-2">
+              <div class="row">
+                <div class="col-6 pe-0"><img src="https://placehold.jp/250x180.png" alt="広告1" style="width:100%"></div>
+                <div class="col-6">タイトル</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid p-0">
+    <div class="bg-secondary bg-opacity-10 p-1">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mt-5 ms-4">
+          <li class="breadcrumb-item"><a href="#">ページTOPへ戻る</a></li>
+          <li class="breadcrumb-item"><a href="../TOP.html">ホーム</a></li>
+        </ol>
+      </nav>
+      <p class="text-center footer m-0 p-4">ゲーマーの道2023</p>
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="vote.js"></script>
+
+<div class="d-none d-sm-none d-md-block d-lg-none">
+
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="m-0 ms-5">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="../TOP.html">Home</a></li>
+      <li class="breadcrumb-item"><a href="../PC/PC.html">PC</a></li>
+      <li class="breadcrumb-item active" aria-current="page">「ゲーミングキーボード」って何？種類と選び方をわかりやすく解説！</li>
+    </ol>
+  </nav>
+  <div class="container">
+    <div class="row mt-5">
+      <div class="col-md-8">
+      </div>
+
+      <div class="col-md-4 mt-5">
+        <div class="thumbnail profile">
+          <img src="https://placehold.jp/300x185.png" alt="参考画像" style="width:100%">
+          <div class="d-grid gap-2 col-auto mx-auto topic">
+            <p class="fs-1 border-bottom">name</p>
+          </div>
+          <div class="row">
+            <p>FPSゲームプレイ歴6年</p>
+            <p>APEXのプレイ時間は1500時間以上</p>
+            <p class="mb-5">ゲームライフを充実させるために日々、周辺機器などの情報を収集してます！</p>
+            <div class="col-md-auto"><img src="../共有アイコン1.png" alt="共有" class="lgicon"></div>
+            <div class="col-md-auto"><img src="../FACEBOOK風のアイコン素材%20その3.png" alt="Facebook" class="lgicon"></div>
+            <div class="col-md-auto"><img src="../twitterのアイコン素材%20その2.png" alt="twitter" class="lgicon"></div>
+          </div>
+          <div class="row mt-4">
+            <p class="fs-3 mb-1">カテゴリー</p>
+            <p class="border-bottom"></p>
+            <ul class="list-group ms-2 mb-3">
+              <li class="list-group-item"><a href="../PC/PC.html">PC</a></li>
+              <li class="list-group-item"><a href="../earphone.html">イヤホン</a></li>
+              <li class="list-group-item"><a href="../mouse.html">マウス</a></li>
+              <li class="list-group-item"><a href="keyboard.html">キーボード</a></li>
+            </ul>
+          </div>
+          <div class="row top mb-3">
+            <p class="border-bottom"></p>
+            <p class="fs-3 m-1">おすすめ記事</p>
+            <div class="col-12 m-2">
+              <div class="row">
+                <div class="col-6 pe-0"><img src="https://placehold.jp/250x180.png" alt="広告1" style="width:100%"></div>
+                <div class="col-6">タイトル</div>
+              </div>
+            </div>
+            <div class="col-12 m-2">
+              <div class="row">
+                <div class="col-6 pe-0"><img src="https://placehold.jp/250x180.png" alt="広告1" style="width:100%"></div>
+                <div class="col-6">タイトル</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container-fluid p-0">
+    <div class="bg-secondary bg-opacity-10 p-1">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mt-5 ms-4">
+          <li class="breadcrumb-item"><a href="#">ページTOPへ戻る</a></li>
+          <li class="breadcrumb-item"><a href="../TOP.html">ホーム</a></li>
+        </ol>
+      </nav>
+      <p class="text-center footer m-0 p-4">ゲーマーの道2023</p>
+    </div>
+  </div>
+</div>
+
+
+<div class="d-sm-block d-md-none d-lg-none">
+  <div class="container-fluid p-0">
+    <div class="row bg-secondary text-light m-0">
+      <h6 class="ps-3 pt-1">ゲーム環境を作るためのロードマップ</h6>
+    </div>
+    <div class="mt-2"><a href="../TOP.html"><img src="../rogo0102.png" alt="top画" class="logo"></a></div>
+  </div>
+
+  <div id="nav-wrapper" class="nav-wrapper">
+    <div class="hamburger" id="js-hamburger">
+      <span class="hamburger__line hamburger__line--1"></span>
+      <span class="hamburger__line hamburger__line--2"></span>
+      <span class="hamburger__line hamburger__line--3"></span>
+    </div>
+    <nav class="sp-nav">
+      <div class="row-cols-4 ps-3 mt-5">
+        <div class="col-auto text-center">
+          <p><a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fs-5" href="TOP.html">ホーム</a></p>
+        </div>
+        <div class="col-auto text-center">
+          <p><a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fs-5" href="PC/PC.html">PC</a></p>
+        </div>
+        <div class="col-auto text-center">
+          <p><a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fs-5" href="earphone.html">イヤホン</a></p>
+        </div>
+        <div class="col-auto text-center">
+          <p><a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fs-5" href="mouse.html">マウス</a></p>
+        </div>
+        <div class="col-auto text-center">
+          <p><a class="link-dark link-offset-2 link-underline-opacity-25 link-underline-opacity-100-hover fs-5" href="keyboard/keyboard.html">キーボード</a></p>
+        </div>
+      </div>
+    </nav>
+    <div class="black-bg" id="js-black-bg"></div>
+  </div>
+
+
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb" class="m-0 ms-5">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="../TOP.html">Home</a></li>
+      <li class="breadcrumb-item"><a href="../PC/PC.html">PC</a></li>
+      <li class="breadcrumb-item active" aria-current="page">「ゲーミングキーボード」って何？種類と選び方をわかりやすく解説！</li>
+    </ol>
+  </nav>
+  <div class="container">
+    <div class="row mt-5">
+
+    </div>
+  </div>
+  <div class="bg-secondary bg-opacity-10">
+    <div class="container">
+      <div class="row">
+        <div class="col-5 thumbnail topic">
+          <img src="https://placehold.jp/140x110.png" alt="参考画像" style="width:100%">
+        </div>
+        <div class="col-auto mt-3">
+          <div class="d-grid gap-2 mx-auto">
+            <p class="fs-1 border-bottom border-3">seiga</p>
+          </div>
+          <p>FPSゲームプレイ歴6年<br>APEXのプレイ時間は1500時間以上</p>
+          <p class="mb-1">ゲームライフを充実させるために日々、<br>周辺機器などの情報を収集してます！</p>
+        </div>
+      </div>
+      <div class="row"><p class="fs-5 border-bottom border-2"></p></div>
+      <div class="row">
+        <div class="col-4 my-box"></div>
+        <div class="col-4 my-box">
+          <img src="../共有アイコン1.png" alt="共有" class="m-2">
+          <img src="../FACEBOOK風のアイコン素材%20その3.png" alt="Facebook" class="m-2">
+          <img src="../twitterのアイコン素材%20その2.png" alt="twitter" class="m-2">
+        </div>
+        <div class="col-4 my-box"></div>
+      </div>
+      <div class="row top">
+        <p class="border-bottom border-2"></p>
+        <p class="fs-3">カテゴリー</p>
+        <ul class="list-group">
+          <li class="list-group-item"><a href="../PC/PC.html">PC</a></li>
+          <li class="list-group-item"><a href="../earphone.html">イヤホン</a></li>
+          <li class="list-group-item"><a href="../mouse.html">マウス</a></li>
+          <li class="list-group-item"><a href="keyboard.html">キーボード</a></li>
+        </ul>
+      </div>
+      <p class="border-bottom border-3"></p>
+      <p class="fs-3">おすすめ記事</p>
+      <div class="row">
+        <div class="col-5 mb-3"><img src="https://placehold.jp/250x180.png" alt="広告1" style="width:100%"></div>
+        <div class="col-7">タイトル</div>
+      </div>
+      <div class="row">
+        <div class="col-5 mb-3"><img src="https://placehold.jp/250x180.png" alt="広告1" style="width:100%"></div>
+        <div class="col-7">タイトル</div>
+      </div>
+      <div class="row"><p class="border-bottom border-2"></p></div>
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="#">ページTOPへ戻る</a></li>
+          <li class="breadcrumb-item"><a href="../TOP.html">ホーム</a></li>
+        </ol>
+      </nav>
+      <p class="text-center m-0 p-3">my-blog2023</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
