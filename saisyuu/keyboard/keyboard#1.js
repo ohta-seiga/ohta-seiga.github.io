@@ -1,10 +1,8 @@
-let applicationId = '1054087482094266163';
-
 function fetchRankingData() {
   let apiUrl = 'https://app.rakuten.co.jp/services/api/IchibaItem/Ranking/20170628';
 
   let params = new URLSearchParams({
-    applicationId: applicationId,
+    applicationId: 1054087482094266163,
     elements: "rank,shopName,itemUrl,mediumImageUrls[0],mediumImageUrls",
     genreId: 567169,
   });
